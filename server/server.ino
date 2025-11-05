@@ -12,6 +12,7 @@
  */
 
 #include "WiFiS3.h"
+#include "Message.h"
 
 
 

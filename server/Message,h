@@ -1,0 +1,7 @@
+Class Message {
+    unsigned long time;
+    int Temp;
+    int Humidity;
+    int pressure;
+    int Light;
+}

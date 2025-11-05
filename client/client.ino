@@ -8,11 +8,17 @@
   https://docs.arduino.cc/tutorials/uno-r4-wifi/wifi-examples#wi-fi-web-client-ssl
 */
 
+
 #include "WiFiS3.h"
 #include "WiFiSSLClient.h"
 #include "IPAddress.h"
 
 #include "arduino_secrets.h"
+#include <SPI.h>
+#include <SD.h>
+
+File myFile;
+
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
 char ssid[] = SECRET_SSID;        // your network SSID (name)
@@ -21,22 +27,27 @@ char pass[] = SECRET_PASS;        // your network password (use for WPA, or use 
 int status = WL_IDLE_STATUS;
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
-//IPAddress server(74,125,232,128);  // numeric IP for Google (no DNS)
-char server[] = "www.google.com";    // name address for Google (using DNS)
+IPAddress server(74,125,232,128);  // numeric IP
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server
 // that you want to connect to (port 80 is default for HTTP):
 WiFiSSLClient client;
 
+int myFile;
 /* -------------------------------------------------------------------------- */
 void setup() {
 /* -------------------------------------------------------------------------- */
   //Initialize serial and wait for port to open:
   Serial.begin(115200);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
+  
+
+  if (!SD.begin(4)) {
+    Serial.println("initialization failed!");
+    while (1);
   }
+
+  myFile = SD.open("test.txt", FILE_WRITE);
 
   // check for the WiFi module:
   if (WiFi.status() == WL_NO_MODULE) {
@@ -50,11 +61,18 @@ void setup() {
     Serial.println("Please upgrade the firmware");
   }
 
+
+}
+
+/* -------------------------------------------------------------------------- */
+void loop() {
+/* -------------------------------------------------------------------------- */
+  
   // attempt to connect to WiFi network:
-  while (status != WL_CONNECTED) {
+  if (status != WL_CONNECTED) {
     Serial.print("Attempting to connect to SSID: ");
     Serial.println(ssid);
-    // Connect to WPA/WPA2 network.
+
     status = WiFi.begin(ssid, pass);
 
     // wait 10 seconds for connection:
@@ -62,21 +80,46 @@ void setup() {
     while (millis() - waiter < 10000) {
         int x = 5
     }
+   
+  } else {
+    printWifiStatus();
+
+    Serial.println("\nStarting connection to server...");
+    // if you get a connection, report back via serial:
+
+    if (client.connect(server, 443)) {
+        Serial.println("connected to server");
+        // Connect to WPA/WPA2 network.
+        status = WiFi.begin(ssid, pass);
+
+        // wait 10 seconds for connection:
+        unsigned long waiter = millis();
+        while (millis() - waiter < 10000) {
+            int x = 5
+        } // Make a HTTP request:
+        
+        if (myFile) {
+            
+            myFile = SD.open("test.txt");
+            while (myFile.available()) {
+            client.println(myFile.read());
+            }
+                
+        }
+        
+    }
+
+
   }
 
-  printWifiStatus();
+  //read stuff and print message to file
+  Message newData;
 
-  Serial.println("\nStarting connection to server...");
-  // if you get a connection, report back via serial:
+  myFile = SD.open("test.txt", FILE_WRITE);
+  myFile.println(newData);
 
-  if (client.connect(server, 443)) {
-    Serial.println("connected to server");
-    // Make a HTTP request:
-    client.println("GET / HTTP/1.1");
-    client.println("Host: www.google.com");
-    client.println("Connection: close");
-    client.println();
-  }
+
+
 }
 
 /* just wrap the received data up to 80 columns in the serial print*/
@@ -95,12 +138,11 @@ void read_response() {
       Serial.println();
     }
   }
-}
 
-/* -------------------------------------------------------------------------- */
-void loop() {
-/* -------------------------------------------------------------------------- */
-  read_response();
+
+
+
+read_response();
 
   // if the server's disconnected, stop the client:
   if (!client.connected()) {
