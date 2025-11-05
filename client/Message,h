@@ -1,7 +1,7 @@
 Class Message {
     unsigned long time;
-    int Temp;
-    int Humidity;
+    float Temp;
+    float Humidity;
     int pressure;
     int Light;
 }

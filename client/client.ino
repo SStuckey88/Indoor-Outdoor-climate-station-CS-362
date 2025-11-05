@@ -17,7 +17,18 @@
 #include <SPI.h>
 #include <SD.h>
 
+#include <dht11.h>
+#define DHT11PIN 8
+
+#include <Adafruit_BMP280.h>
+
+Adafruit_BMP280  bmp; // I2C
+
+dht11 DHT11;
+
 File myFile;
+
+int lastSecond = 0;
 
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
@@ -61,8 +72,17 @@ void setup() {
     Serial.println("Please upgrade the firmware");
   }
 
+    /* Default  settings from datasheet. */
+  bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /*  Operating Mode. */
+                  Adafruit_BMP280::SAMPLING_X2,     /* Temp.  oversampling */
+                  Adafruit_BMP280::SAMPLING_X16,    /* Pressure  oversampling */
+                  Adafruit_BMP280::FILTER_X16,      /* Filtering.  */
+                  Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
 
-}
+
+
+    DigitalWrite(greenLedPin, HIGH);
+                }
 
 /* -------------------------------------------------------------------------- */
 void loop() {
@@ -88,6 +108,7 @@ void loop() {
     // if you get a connection, report back via serial:
 
     if (client.connect(server, 443)) {
+        DigitalWrite(RedLedPin, HIGH);
         Serial.println("connected to server");
         // Connect to WPA/WPA2 network.
         status = WiFi.begin(ssid, pass);
@@ -112,12 +133,20 @@ void loop() {
 
   }
 
+
+  if (second() != last_second) {
   //read stuff and print message to file
-  Message newData;
+    Message newData;
+    newData.time = millis()
+    newData.light = analogueRead(A0)
+    newData.pressure = float P = bmp.readPressure()/3386.39;
+    newData.humidity = (float)DHT11.humidity
+    newData.temp = (float)DHT11.temperature;
 
-  myFile = SD.open("test.txt", FILE_WRITE);
-  myFile.println(newData);
-
+    myFile = SD.open("test.txt", FILE_WRITE);
+    myFile.println(newData);
+    last_second = second();
+  }
 
 
 }
@@ -147,11 +176,7 @@ read_response();
   // if the server's disconnected, stop the client:
   if (!client.connected()) {
     Serial.println();
-    Serial.println("disconnecting from server.");
-    client.stop();
 
-    // do nothing forevermore:
-    while (true);
   }
 }
 
