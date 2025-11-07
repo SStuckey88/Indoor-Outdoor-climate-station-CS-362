@@ -20,7 +20,7 @@ void setup() {
 
     Wire.begin();
 
-    dht11.setDelay(3000);
+    dht11.setDelay(5000);
     
     pressureSensor.setI2CAddress(0x76);
     if(pressureSensor.beginI2C() == false) Serial.println("Barometric Pressure sensor connect failed");
