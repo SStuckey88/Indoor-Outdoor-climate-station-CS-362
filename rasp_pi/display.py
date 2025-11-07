@@ -1,8 +1,6 @@
 import sqlite3
 from nicegui import ui
 from datetime import datetime
-import numpy as np
-from random import random
 
 indoorTemp = 0
 indoorHum = 0
