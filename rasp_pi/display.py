@@ -4,13 +4,16 @@ from datetime import datetime
 
 indoorTemp = 0
 indoorHum = 0
+pressure = 0
 
 indoorTempLabel = ui.label()
 indoorHumLabel = ui.label()
+pressureLabel = ui.label()
 
 x = []
 tempY = []
-humY = []    
+humY = []
+presY = []    
 
 def updateData():
     #Connect to database
@@ -22,12 +25,16 @@ def updateData():
     
     indoorTemp = rows[0][1]
     indoorHum = rows[0][2]
+    pressure = rows[0][3]
     indoorTempLabel.set_text(f"Indoor Temperature: {indoorTemp}°C")
     indoorHumLabel.set_text(f"Indoor Humidity: {indoorHum}%")
+    pressureLabel.set_text(f"Bar. Pressure: {pressure}Pa")
     
     x = []
     tempY = []
     humY = []
+    presY = [] 
+    
     for row in reversed(rows):
         currDatetime = datetime.fromtimestamp(row[0])
         currTime = currDatetime.strftime("%I:%M")
@@ -35,6 +42,7 @@ def updateData():
         x.append(currTime)
         tempY.append(row[1])
         humY.append(row[2])
+        presY.append(row[3])
         
     tempChart.options['series'][0]['data'] = tempY
     tempChart.options['xAxis']['name'] = currDate
@@ -45,10 +53,17 @@ def updateData():
     humChart.options['xAxis']['name'] = currDate
     humChart.options['xAxis']['data'] = x
     humChart.options['yAxis']['data'] = humY
+    
+    presChart.options['series'][0]['data'] = presY
+    presChart.options['xAxis']['name'] = currDate
+    presChart.options['xAxis']['data'] = x
+    presChart.options['yAxis']['data'] = presY
 
 indoorTempLabel.set_text(f"Indoor Temperature: {indoorTemp}°")
 
 indoorHumLabel.set_text(f"Indoor Humidity: {indoorHum}%")
+
+pressureLabel.set_text(f"Bar. Pressure: {pressure} Pa")
     
 tempChart = ui.echart({
     'xAxis': {'type': 'category', 'data': [], 'name':'Time', 'nameLocation':'center'},
@@ -62,6 +77,12 @@ humChart = ui.echart({
     'series': [{'type': 'line', 'data': []}],
 })
 
-ui.timer(30.0, updateData)
+presChart = ui.echart({
+    'xAxis': {'type': 'category', 'data': [], 'name':'Time', 'nameLocation':'center'},
+    'yAxis': {'type': 'value', 'data': [], 'name':'Barometric Pressure', 'nameLocation':'center'},
+    'series': [{'type': 'line', 'data': []}],
+})
+
+ui.timer(5.0, updateData)
 
 ui.run()

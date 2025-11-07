@@ -14,8 +14,8 @@ def insertClimateData(data):
     con = sqlite3.connect("climatedata.db")
     cur = con.cursor()
     cur.execute(f'''INSERT INTO climate 
-                (timestamp, indoorTemp, indoorHum) 
-                values({timestamp}, {data['temp']}, {data['hum']})''')
+                (timestamp, indoorTemp, indoorHum, pressure) 
+                values({timestamp}, {data['temp']}, {data['hum']}, {data['pres']})''')
     con.commit()
     con.close()
     
