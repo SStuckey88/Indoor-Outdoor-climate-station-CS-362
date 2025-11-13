@@ -90,7 +90,7 @@ void loop() {
     
     
     
-    }
+      }
     }
     // give the web browser time to receive the data
     unsigned long waiter = millis();

@@ -34,7 +34,6 @@ def main():
             line = ser.readline().decode('utf-8').rstrip()
             data = dict(item.split("=") for item in line.split(";"))
             insertClimateData(data)
-            #printDB()
 
 if __name__ == '__main__':
     main()
