@@ -40,6 +40,7 @@ def main():
             elif(firstChar == 'D'):
                 data = dict(item.split("=") for item in message.split(";"))
                 insertClimateData(data)
+            print(message)
 
 if __name__ == '__main__':
     main()

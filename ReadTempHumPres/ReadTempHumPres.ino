@@ -104,7 +104,6 @@ void processSyncMessage() {
     //setTime(int hr,int min,int sec,int day, int month, int yr);
      pctime = Serial.parseInt();
     setTime(pctime); // Sync Arduino clock to the time received on the serial port
-    Serial.println("Time set!");
   }
 }
     

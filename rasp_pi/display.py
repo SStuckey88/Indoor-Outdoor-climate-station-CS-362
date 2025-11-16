@@ -2,10 +2,12 @@ import sqlite3
 from nicegui import ui
 from datetime import datetime
 
+latestSync = 0
 indoorTemp = 0
 indoorHum = 0
 pressure = 0
 
+latestSyncLabel = ui.label()
 indoorTempLabel = ui.label()
 indoorHumLabel = ui.label()
 pressureLabel = ui.label()
@@ -23,6 +25,7 @@ def updateData():
     rows = cur.fetchall()
     cur.close()
     
+    latestSync = rows[0][0]
     indoorTemp = rows[0][1]
     indoorHum = rows[0][2]
     pressure = rows[0][3]
@@ -58,6 +61,8 @@ def updateData():
     presChart.options['xAxis']['name'] = currDate
     presChart.options['xAxis']['data'] = x
     presChart.options['yAxis']['data'] = presY
+    
+latestSyncLabel.set_text(f"Latest Sync: {latestSync}")
 
 indoorTempLabel.set_text(f"Indoor Temperature: {indoorTemp}°")
 
