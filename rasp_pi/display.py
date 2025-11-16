@@ -29,6 +29,7 @@ def updateData():
     indoorTemp = rows[0][1]
     indoorHum = rows[0][2]
     pressure = rows[0][3]
+    latestSyncLabel.set_text(f"Latest Sync: {latestSync}")
     indoorTempLabel.set_text(f"Indoor Temperature: {indoorTemp}°C")
     indoorHumLabel.set_text(f"Indoor Humidity: {indoorHum}%")
     pressureLabel.set_text(f"Bar. Pressure: {pressure}Pa")
@@ -63,11 +64,8 @@ def updateData():
     presChart.options['yAxis']['data'] = presY
     
 latestSyncLabel.set_text(f"Latest Sync: {latestSync}")
-
 indoorTempLabel.set_text(f"Indoor Temperature: {indoorTemp}°")
-
 indoorHumLabel.set_text(f"Indoor Humidity: {indoorHum}%")
-
 pressureLabel.set_text(f"Bar. Pressure: {pressure} Pa")
     
 tempChart = ui.echart({

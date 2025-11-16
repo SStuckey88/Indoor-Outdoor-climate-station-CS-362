@@ -35,7 +35,7 @@ def main():
             firstChar = line[0]
             message = line[1:]
             if(firstChar == 'T'):
-                timestamp = str(datetime.now().timestamp())
+                timestamp = 'T' + str(datetime.now().timestamp())
                 ser.write(timestamp.encode())
             elif(firstChar == 'D'):
                 data = dict(item.split("=") for item in message.split(";"))
