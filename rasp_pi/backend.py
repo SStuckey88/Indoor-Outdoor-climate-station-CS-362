@@ -10,12 +10,12 @@ ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 #columns: timestamp, indoorTemp, indoorHumidity, indoorAirQuality, outdoorTemp, outdoorHumidity, outdoorPressure
 
 def insertClimateData(data):
-    timestamp = datetime.now().timestamp()
+    
     con = sqlite3.connect("climatedata.db")
     cur = con.cursor()
     cur.execute(f'''INSERT INTO climate 
                 (timestamp, indoorTemp, indoorHum, pressure) 
-                values({timestamp}, {data['temp']}, {data['hum']}, {data['pres']})''')
+                values({data['time']}, {data['temp']}, {data['hum']}, {data['pres']})''')
     con.commit()
     con.close()
     
@@ -32,8 +32,14 @@ def main():
     while True:
         if ser.in_waiting > 0:
             line = ser.readline().decode('utf-8').rstrip()
-            data = dict(item.split("=") for item in line.split(";"))
-            insertClimateData(data)
+            firstChar = line[0]
+            message = line[1:]
+            if(firstChar == 'T'):
+                timestamp = datetime.now().timestamp()
+                ser.write(timestamp)
+            elif(firstChar == 'D'):
+                data = dict(item.split("=") for item in message.split(";"))
+                insertClimateData(data)
 
 if __name__ == '__main__':
     main()

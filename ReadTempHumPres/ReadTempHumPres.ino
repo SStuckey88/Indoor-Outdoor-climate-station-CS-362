@@ -47,6 +47,8 @@ void setup() {
     
     pressureSensor.setI2CAddress(0x76);
     if(pressureSensor.beginI2C() == false) Serial.println("EBarometric Pressure sensor connection failed");
+
+    setSyncProvider(requestTimeSync); 
 }
 
 void loop() {
@@ -68,20 +70,41 @@ void loop() {
         previousJoystickMillis = currentMillis;
     }
 
-    //Timer for taking measurements
     if (currentMillis - previousMillis >= (interval*50)) {
+        if(timeStatus() == timeSet) {
+            time_t time = now();
+            int result = dht11.readTemperatureHumidity(temp, hum);
+            barPres = pressureSensor.readFloatPressure();
 
-        int result = dht11.readTemperatureHumidity(temp, hum);
-        barPres = pressureSensor.readFloatPressure();
-
-        if (result == 0) {
-            sprintf(serialSend, "Dtemp=%d;hum=%d;pres=%.0f", temp, hum, barPres);
-            Serial.println(serialSend);
-        } else {
-            // Print error message based on the error code.
-            Serial.println("ETemp/Humidity sensor connection failed");
+            if (result == 0) {
+                sprintf(serialSend, "Dtime=%d;temp=%d;hum=%d;pres=%.0f", time, temp, hum, barPres);
+                Serial.println(serialSend);
+            } else {
+                // Print error message based on the error code.
+                Serial.println("ETemp/Humidity sensor connection failed");
+            }
+            previousMillis = currentMillis;
         }
-        previousMillis = currentMillis;
     }
+    if (Serial.available()) {
+        processSyncMessage();
+    } 
+}
+
+time_t requestTimeSync()
+{
+  Serial.println("T");  
+  return 0; // the time will be sent later in response to serial mesg
+}
+
+void processSyncMessage() {
+  unsigned long pctime;
+
+  if(Serial.find('T')) {
+    //setTime(int hr,int min,int sec,int day, int month, int yr);
+     pctime = Serial.parseInt();
+    setTime(pctime); // Sync Arduino clock to the time received on the serial port
+    Serial.println("Time set!");
+  }
 }
     
