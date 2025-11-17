@@ -17,7 +17,9 @@ tvocLabel = ui.label()
 x = []
 tempY = []
 humY = []
-presY = []    
+presY = []
+
+ui.dark_mode().enable 
 
 def updateData():
     #Connect to database
