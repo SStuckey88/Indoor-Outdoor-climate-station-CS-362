@@ -15,7 +15,7 @@ def insertClimateData(data):
     cur = con.cursor()
     cur.execute(f'''INSERT INTO climate 
                 (timestamp, indoorTemp, indoorHum, pressure) 
-                values({data['time']}, {data['temp']}, {data['hum']}, {data['pres']})''')
+                values({data['time']}, {data['temp']}, {data['hum']}, {data['pres']}, {data['tvoc']})''')
     con.commit()
     con.close()
     

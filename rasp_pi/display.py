@@ -6,11 +6,13 @@ latestSync = 0
 indoorTemp = 0
 indoorHum = 0
 pressure = 0
+tvoc = 0
 
 latestSyncLabel = ui.label()
 indoorTempLabel = ui.label()
 indoorHumLabel = ui.label()
 pressureLabel = ui.label()
+tvocLabel = ui.label()
 
 x = []
 tempY = []
@@ -29,10 +31,12 @@ def updateData():
     indoorTemp = rows[0][1]
     indoorHum = rows[0][2]
     pressure = rows[0][3]
+    tvoc = rows[0][4]
     latestSyncLabel.set_text(f"Latest Sync: {latestSync}")
     indoorTempLabel.set_text(f"Indoor Temperature: {indoorTemp}°C")
     indoorHumLabel.set_text(f"Indoor Humidity: {indoorHum}%")
-    pressureLabel.set_text(f"Bar. Pressure: {pressure}Pa")
+    pressureLabel.set_text(f"Bar. Pressure: {pressure} Pa")
+    tvocLabel.set_text(f"TVOC: {tvoc} PPM")
     
     x = []
     tempY = []
@@ -67,6 +71,7 @@ latestSyncLabel.set_text(f"Latest Sync: {latestSync}")
 indoorTempLabel.set_text(f"Indoor Temperature: {indoorTemp}°")
 indoorHumLabel.set_text(f"Indoor Humidity: {indoorHum}%")
 pressureLabel.set_text(f"Bar. Pressure: {pressure} Pa")
+tvocLabel.set_text(f"TVOC: {tvoc} PPM")
     
 tempChart = ui.echart({
     'xAxis': {'type': 'category', 'data': [], 'name':'Time', 'nameLocation':'center'},
