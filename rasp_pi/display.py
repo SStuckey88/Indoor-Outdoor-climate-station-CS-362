@@ -74,7 +74,7 @@ pressureLabel.set_text(f"Bar. Pressure: {pressure} Pa")
 tvocLabel.set_text(f"TVOC: {tvoc} PPM")
     
 tempChart = ui.echart({
-    'xAxis': {'type': 'category', 'data': [], 'name':'Time', 'nameLocation':'center', 'axisLine.lineStyle.color':'#FFFFFF'},
+    'xAxis': {'type': 'category', 'data': [], 'name':'Time', 'nameLocation':'center', 'axisLine':{'lineStyle':{'color':'#FFFFFF'}}},
     'yAxis': {'type': 'value', 'data': [], 'name':'Temperature', 'nameLocation':'center'},
     'series': [{'type': 'line', 'data': []}],
 })
