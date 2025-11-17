@@ -36,7 +36,7 @@ def updateData():
     indoorTempLabel.set_text(f"Indoor Temperature: {indoorTemp}°C")
     indoorHumLabel.set_text(f"Indoor Humidity: {indoorHum}%")
     pressureLabel.set_text(f"Bar. Pressure: {pressure} Pa")
-    tvocLabel.set_text(f"TVOC: {tvoc} PPM")
+    tvocLabel.set_text(f"TVOC: {tvoc} PPB")
     
     x = []
     tempY = []
@@ -93,6 +93,6 @@ presChart = ui.echart({
 
 ui.timer(5.0, updateData)
 
-ui.query('body').style('background-image: linear-gradient(to bottom, #3A3A52, #020111);')
+ui.query('body').style('background-image: linear-gradient(to bottom, #3A3A52, #020111); color: white;')
 
 ui.run()
