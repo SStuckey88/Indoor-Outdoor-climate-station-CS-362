@@ -19,8 +19,6 @@ tempY = []
 humY = []
 presY = []
 
-ui.dark_mode().enable 
-
 def updateData():
     #Connect to database
     con = sqlite3.connect("climatedata.db")
@@ -94,5 +92,7 @@ presChart = ui.echart({
 })
 
 ui.timer(5.0, updateData)
+
+ui.query('body').style('background-color: red')
 
 ui.run()
