@@ -15,7 +15,7 @@ def insertClimateData(data):
     cur = con.cursor()
     cur.execute(f'''INSERT INTO climate 
                 (timestamp, indoorTemp, indoorHum, pressure) 
-                values({data['time']}, {data['temp']}, {data['hum']}, {data['pres']})''')
+                values({data['time']}, {data['temp']}, {data['hum']}, {data['pres']}, {data['tvoc']})''')
     con.commit()
     con.close()
     
@@ -40,7 +40,10 @@ def main():
             elif(firstChar == 'D'):
                 data = dict(item.split("=") for item in message.split(";"))
                 insertClimateData(data)
-            print(message)
+            elif(firstChar == 'J'):
+                print(message)
+            else:
+                print(message)
 
 if __name__ == '__main__':
     main()
