@@ -77,6 +77,9 @@ tempChart = ui.echart({
     'xAxis': {'type': 'category', 'data': [], 'name':'Time', 'nameLocation':'center'},
     'yAxis': {'type': 'value', 'data': [], 'name':'Temperature', 'nameLocation':'center'},
     'series': [{'type': 'line', 'data': []}],
+}, theme={
+    'color': ['#b687ac', '#28738a', '#a78f8f'],
+    'backgroundColor': 'rgba(254,248,239,1)',
 })
 
 humChart = ui.echart({
