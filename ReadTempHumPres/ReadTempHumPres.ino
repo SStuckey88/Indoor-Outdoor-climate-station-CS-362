@@ -43,7 +43,7 @@ void setup() {
 
     Wire.begin();
 
-    dht11.setDelay(0);
+    dht11.setDelay(10);
     
     pressureSensor.setI2CAddress(0x76);
     if(pressureSensor.beginI2C() == false) Serial.println("EBarometric Pressure sensor connection failed");
@@ -73,11 +73,12 @@ void loop() {
     if (currentMillis - previousMillis >= (interval*50)) {
         if(timeStatus() == timeSet) {
             time_t time = now();
+            unsigned long seconds = (unsigned long) time;
             int result = dht11.readTemperatureHumidity(temp, hum);
             barPres = pressureSensor.readFloatPressure();
 
             if (result == 0) {
-                sprintf(serialSend, "Dtime=%d;temp=%d;hum=%d;pres=%.0f", time, temp, hum, barPres);
+                sprintf(serialSend, "Dtime=%lu;temp=%d;hum=%d;pres=%.0f", seconds, temp, hum, barPres);
                 Serial.println(serialSend);
             } else {
                 // Print error message based on the error code.
