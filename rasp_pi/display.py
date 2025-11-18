@@ -71,8 +71,10 @@ latestSyncLabel.set_text(f"Latest Sync: {latestSync}")
 indoorTempLabel.set_text(f"Indoor Temperature: {indoorTemp}°")
 indoorHumLabel.set_text(f"Indoor Humidity: {indoorHum}%")
 pressureLabel.set_text(f"Bar. Pressure: {pressure} Pa")
-tvocLabel.set_text(f"TVOC: {tvoc} PPM")
-    
+tvocLabel.set_text(f"TVOC: {tvoc} PPB")
+
+
+#TODO: Change these to Plotly, I hate these weird Apache charts.
 tempChart = ui.echart({
     'xAxis': {'type': 'category', 'data': [], 'name':'Time', 'nameLocation':'center', 'axisLine':{'lineStyle':{'color':'#FFFFFF'}}},
     'yAxis': {'type': 'value', 'data': [], 'name':'Temperature', 'nameLocation':'center'},
@@ -91,8 +93,33 @@ presChart = ui.echart({
     'series': [{'type': 'line', 'data': []}],
 })
 
+fig = {
+    'data': [
+        {
+            'type': 'scatter',
+            'name': 'Trace 1',
+            'x': [1, 2, 3, 4],
+            'y': [1, 2, 3, 2.5],
+        },
+        {
+            'type': 'scatter',
+            'name': 'Trace 2',
+            'x': [1, 2, 3, 4],
+            'y': [1.4, 1.8, 3.8, 3.2],
+            'line': {'dash': 'dot', 'width': 3},
+        },
+    ],
+    'layout': {
+        'margin': {'l': 15, 'r': 0, 't': 0, 'b': 15},
+        'plot_bgcolor': '#E5ECF6',
+        'xaxis': {'gridcolor': 'white'},
+        'yaxis': {'gridcolor': 'white'},
+    },
+}
+ui.plotly(fig).classes('w-full h-40')
+
 ui.timer(5.0, updateData)
 
-ui.query('body').style('background-image: linear-gradient(to bottom, #3A3A52, #020111); color: white;')
+ui.query('body').style('background-image: linear-gradient(to bottom, #3A3A52, #020111); color: white; cursor: none;')
 
 ui.run()

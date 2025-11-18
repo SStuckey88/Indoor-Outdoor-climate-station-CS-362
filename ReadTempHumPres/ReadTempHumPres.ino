@@ -88,9 +88,12 @@ void loop() {
                 // Print error message based on the error code.
                 Serial.println("ETemp/Humidity sensor connection failed");
             }
-            previousMillis = currentMillis;
+        } else {
+            requestTimeSync();
         }
+        previousMillis = currentMillis;
     }
+
     if (Serial.available()) {
         processSyncMessage();
     } 
