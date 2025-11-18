@@ -120,6 +120,6 @@ ui.plotly(fig).classes('w-full h-40')
 
 ui.timer(5.0, updateData)
 
-ui.query('body').style('background-image: linear-gradient(to bottom, #3A3A52, #020111); color: white;')
+ui.query('body').style('background-image: linear-gradient(to bottom, #3A3A52, #020111); color: white; cursor: none;')
 
 ui.run()
