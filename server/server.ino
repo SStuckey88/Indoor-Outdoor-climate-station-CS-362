@@ -22,7 +22,11 @@ char ssid[] = SECRET_SSID;        // your network SSID (name)
 char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as key for WEP)
 int keyIndex = 0;                 // your network key index number (needed only for WEP)
 
+IPAddress staticIP(192, 168, 1, 100);
+
+
 int status = WL_IDLE_STATUS;
+
 
 WiFiServer server(80);
 
@@ -45,6 +49,8 @@ void setup() {
     Serial.println("Please upgrade the firmware");
   }
 
+  WiFi.config(staticIp);
+
   // attempt to connect to WiFi network:
   while (status != WL_CONNECTED) {
     Serial.print("Attempting to connect to SSID: ");
@@ -63,56 +69,55 @@ void setup() {
   printWifiStatus();
 }
 
+Message Parser(string messages) {
+
+}
+
+void waiter() {
+  unsigned long waiter = millis();
+    while (millis() - waiter < 10) {
+        int x = 5
+    }
+}
+
+void sendData(String) { 
+
+}
+
+void gatherData() {
+
+
+
+ sendData(String)
+}
+
+
 
 void loop() {
   // listen for incoming clients
   WiFiClient client = server.available();
   if (client) {
     Serial.println("new client");
-    // an HTTP request ends with a blank line
-    boolean currentLineIsBlank = true;
     while (client.connected()) {
       if (client.available()) {
-        Message c = client.read();
-    
-    
-    
-        //decide what to do here please
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        String c = client.read();
+        waiter();
+        sendData(c);
       }
+      gatherdata();
     }
     // give the web browser time to receive the data
-    unsigned long waiter = millis();
-    while (millis() - waiter < 10) {
-        int x = 5
-    }
 
     // close the connection:
     client.stop();
     Serial.println("client disconnected");
+  } else {
+    gatherData();
   }
 
   //read data (client has example)
 
   //send to pi
-
-
-
-
-
-
-
 }
 
 
