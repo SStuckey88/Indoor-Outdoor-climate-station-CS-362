@@ -113,7 +113,9 @@ void setup() {
     Serial.println(status);
     // wait 10 seconds for connection:
     waiter();
+
   }
+   WiFi.config(staticIP);
   server.begin();
   Serial.println(WiFi.localIP());
   // you're connected now, so print out the status:

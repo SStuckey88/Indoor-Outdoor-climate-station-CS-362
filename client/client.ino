@@ -9,147 +9,46 @@
 */
 
 
-#include "WiFiS3.h"
-#include "WiFiSSLClient.h"
-#include "IPAddress.h"
+#include <WiFiS3.h>
+#include <DHT11.h>
+#include <AGS02MA.h>
+#include <TimeLib.h>
+#include <Wire.h>
+#include <SparkFunBME280.h>
 
-#include "arduino_secrets.h"
-#include <SPI.h>
-#include <SD.h>
+BME280 pressureSensor;
+DHT11 dht11(2);
+AGS02MA AGS(26);
 
-#include <dht11.h>
-#define DHT11PIN 8
-
-#include <Adafruit_BMP280.h>
-
-Adafruit_BMP280  bmp; // I2C
-
-dht11 DHT11;
-
-File myFile;
 
 int lastSecond = 0;
 
+char serialSend[100];
+
+int temp = 0;
+int hum = 0;
+int tvoc = 0;
+float barPres = 0.0;
+
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
-char ssid[] = SECRET_SSID;        // your network SSID (name)
-char pass[] = SECRET_PASS;        // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "GovernmentSecurity";        // your network SSID (name)
+char pass[] = "5MfcrCw6";    // your network password (use for WPA, or use as key for WEP)
+int keyIndex = 0;                 // your network key index number (needed only for WEP)
+
+
 
 int status = WL_IDLE_STATUS;
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
-IPAddress server(74,125,232,128);  // numeric IP
+IPAddress server(10, 197, 38, 188);  // numeric IP
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server
 // that you want to connect to (port 80 is default for HTTP):
 WiFiSSLClient client;
 
-int myFile;
-/* -------------------------------------------------------------------------- */
-void setup() {
-/* -------------------------------------------------------------------------- */
-  //Initialize serial and wait for port to open:
-  Serial.begin(115200);
-  
 
-  if (!SD.begin(4)) {
-    Serial.println("initialization failed!");
-    while (1);
-  }
-
-  myFile = SD.open("test.txt", FILE_WRITE);
-
-  // check for the WiFi module:
-  if (WiFi.status() == WL_NO_MODULE) {
-    Serial.println("Communication with WiFi module failed!");
-    // don't continue
-    while (true);
-  }
-
-  String fv = WiFi.firmwareVersion();
-  if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
-    Serial.println("Please upgrade the firmware");
-  }
-
-    /* Default  settings from datasheet. */
-  bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /*  Operating Mode. */
-                  Adafruit_BMP280::SAMPLING_X2,     /* Temp.  oversampling */
-                  Adafruit_BMP280::SAMPLING_X16,    /* Pressure  oversampling */
-                  Adafruit_BMP280::FILTER_X16,      /* Filtering.  */
-                  Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
-
-
-
-    DigitalWrite(greenLedPin, HIGH);
-                }
-
-/* -------------------------------------------------------------------------- */
-void loop() {
-/* -------------------------------------------------------------------------- */
-  
-  // attempt to connect to WiFi network:
-  if (status != WL_CONNECTED) {
-    Serial.print("Attempting to connect to SSID: ");
-    Serial.println(ssid);
-
-    status = WiFi.begin(ssid, pass);
-
-    // wait 10 seconds for connection:
-    unsigned long waiter = millis();
-    while (millis() - waiter < 10000) {
-        int x = 5
-    }
-   
-  } else {
-    printWifiStatus();
-
-    Serial.println("\nStarting connection to server...");
-    // if you get a connection, report back via serial:
-
-    if (client.connect(server, 443)) {
-        DigitalWrite(RedLedPin, HIGH);
-        Serial.println("connected to server");
-        // Connect to WPA/WPA2 network.
-        status = WiFi.begin(ssid, pass);
-
-        // wait 10 seconds for connection:
-        unsigned long waiter = millis();
-        while (millis() - waiter < 10000) {
-            int x = 5
-        } // Make a HTTP request:
-        
-        if (myFile) {
-            
-            myFile = SD.open("test.txt");
-            while (myFile.available()) {
-            client.println(myFile.read());
-            }
-                
-        }
-        
-    }
-
-
-  }
-
-
-  if (second() != last_second) {
-  //read stuff and print message to file
-    Message newData;
-    newData.time = millis()
-    newData.light = analogueRead(A0)
-    newData.pressure = float P = bmp.readPressure()/3386.39;
-    newData.humidity = (float)DHT11.humidity
-    newData.temp = (float)DHT11.temperature;
-
-    myFile = SD.open("test.txt", FILE_WRITE);
-    myFile.println(newData);
-    last_second = second();
-  }
-
-
-}
 
 /* just wrap the received data up to 80 columns in the serial print*/
 /* -------------------------------------------------------------------------- */
@@ -197,4 +96,148 @@ void printWifiStatus() {
   Serial.print("signal strength (RSSI):");
   Serial.print(rssi);
   Serial.println(" dBm");
+}
+
+int myFile;
+/* -------------------------------------------------------------------------- */
+void setup() {
+/* -------------------------------------------------------------------------- */
+  //Initialize serial and wait for port to open:
+  Serial.begin(9600);
+  
+
+  /*if (!SD.begin(4)) {
+    Serial.println("initialization failed!");
+    while (1);
+  }
+
+  myFile = SD.open("test.txt", FILE_WRITE);*/
+
+  // check for the WiFi module:
+  if (WiFi.status() == WL_NO_MODULE) {
+    Serial.println("Communication with WiFi module failed!");
+    // don't continue
+    while (true);
+  }
+
+  String fv = WiFi.firmwareVersion();
+  if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
+    Serial.println("Please upgrade the firmware");
+  }
+
+    /* Default  settings from datasheet. 
+
+
+
+    DigitalWrite(greenLedPin, HIGH);*/
+                }
+
+
+
+void sendData() { 
+  return;
+
+}
+
+void gatherData() {
+
+  unsigned long currentMillis = millis();
+  //Read Joystick data every 100ms - send to Pi if changed since last read
+    /*
+    if (currentMillis - previousMillis >= (interval*50)) {
+        if(timeStatus() == timeSet) {
+            time_t time = now();
+            unsigned long seconds = (unsigned long) time;
+            int result = dht11.readTemperatureHumidity(temp, hum);
+            barPres = pressureSensor.readFloatPressure();
+            tvoc = AGS.readPPB();
+
+            if (result == 0) {
+                sprintf(serialSend, "Dtime=%lu;temp=%d;hum=%d;pres=%.0f;tvoc=%d", seconds, temp, hum, barPres, tvoc);
+                Serial.println(serialSend);
+            } else {
+                // Print error message based on the error code.
+                Serial.println("ETemp/Humidity sensor connection failed");
+            }
+        } else {
+            requestTimeSync();
+        }
+        previousMillis = currentMillis;
+    }
+
+    if (Serial.available()) {
+        processSyncMessage();
+    } **/
+
+
+ sendData();
+}
+
+
+
+/* -------------------------------------------------------------------------- */
+void loop() {
+/* -------------------------------------------------------------------------- */
+  
+  // attempt to connect to WiFi network:
+  if (status != WL_CONNECTED) {
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
+
+    status = WiFi.begin(ssid, pass);
+
+    // wait 10 seconds for connection:
+    unsigned long waiter = millis();
+    while (millis() - waiter < 10000) {
+        int x = 5;
+    }
+   
+  } else {
+    //printWifiStatus();
+
+    Serial.println("\nStarting connection to server...");
+    // if you get a connection, report back via serial:
+
+    Serial.println(client.connect(server, 80));
+    if (false) {
+        Serial.println("connected to server");
+        // Connect to WPA/WPA2 network.
+        status = WiFi.begin(ssid, pass);
+
+        // wait 10 seconds for connection:
+        unsigned long waiter = millis();
+        while (millis() - waiter < 10000) {
+            int x = 5;
+        } 
+        
+        /*if (myFile) {
+            
+            myFile = SD.open("test.txt");
+            while (myFile.available()) {
+            client.println(myFile.read());
+            }*/
+                
+        }
+        
+    }
+
+
+  
+
+  /*
+  if (second() != last_second) {
+  //read stuff and print message to file
+    Message newData;
+    newData.time = millis()
+    newData.light = analogueRead(A0)
+    newData.pressure = float P = bmp.readPressure()/3386.39;
+    newData.humidity = (float)DHT11.humidity
+    newData.temp = (float)DHT11.temperature;
+
+    myFile = SD.open("test.txt", FILE_WRITE);
+    myFile.println(newData);
+    last_second = second();
+  }*/
+
+
 }
