@@ -32,8 +32,8 @@ float barPres = 0.0;
 
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
-char ssid[] = "GovernmentSecurity";        // your network SSID (name)
-char pass[] = "5MfcrCw6";    // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "Maid Café";        // your network SSID (name)
+char pass[] = "Sysadmin24!";     // your network password (use for WPA, or use as key for WEP)
 int keyIndex = 0;                 // your network key index number (needed only for WEP)
 
 
@@ -41,7 +41,13 @@ int keyIndex = 0;                 // your network key index number (needed only 
 int status = WL_IDLE_STATUS;
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
-IPAddress server(10, 197, 38, 188);  // numeric IP
+IPAddress server(172, 25, 6, 50);  // numeric IP
+
+IPAddress ip(172, 25, 6, 51);
+IPAddress gateway(172,25,1,82);
+IPAddress subnet(255,255,255,0);
+
+
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server
@@ -67,10 +73,6 @@ void read_response() {
     }
   }
 
-
-
-
-read_response();
 
   // if the server's disconnected, stop the client:
   if (!client.connected()) {
@@ -121,6 +123,7 @@ void setup() {
   }
 
   String fv = WiFi.firmwareVersion();
+  Serial.println(fv);
   if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
     Serial.println("Please upgrade the firmware");
   }
@@ -173,6 +176,8 @@ void gatherData() {
  sendData();
 }
 
+int counter = 0;
+
 
 
 /* -------------------------------------------------------------------------- */
@@ -183,6 +188,8 @@ void loop() {
   if (status != WL_CONNECTED) {
     Serial.print("Attempting to connect to SSID: ");
     Serial.println(ssid);
+
+    WiFi.config(ip, gateway, gateway, subnet); 
 
     status = WiFi.begin(ssid, pass);
 
@@ -198,16 +205,15 @@ void loop() {
     Serial.println("\nStarting connection to server...");
     // if you get a connection, report back via serial:
 
-    Serial.println(client.connect(server, 80));
-    if (false) {
+    Serial.println(counter);
+    counter += 1;
+    if (client.connect(server, 301)) {
         Serial.println("connected to server");
+        client.println("hi");
+        //read_response();
         // Connect to WPA/WPA2 network.
-        status = WiFi.begin(ssid, pass);
 
         // wait 10 seconds for connection:
-        unsigned long waiter = millis();
-        while (millis() - waiter < 10000) {
-            int x = 5;
         } 
         
         /*if (myFile) {
@@ -222,22 +228,4 @@ void loop() {
     }
 
 
-  
 
-  /*
-  if (second() != last_second) {
-  //read stuff and print message to file
-    Message newData;
-    newData.time = millis()
-    newData.light = analogueRead(A0)
-    newData.pressure = float P = bmp.readPressure()/3386.39;
-    newData.humidity = (float)DHT11.humidity
-    newData.temp = (float)DHT11.temperature;
-
-    myFile = SD.open("test.txt", FILE_WRITE);
-    myFile.println(newData);
-    last_second = second();
-  }*/
-
-
-}

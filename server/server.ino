@@ -46,17 +46,19 @@ int yPrev = 0;
 
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
-char ssid[] = "GovernmentSecurity";        // your network SSID (name)
-char pass[] = "5MfcrCw6";    // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "Maid Café";        // your network SSID (name)
+char pass[] = "Sysadmin24!";    // your network password (use for WPA, or use as key for WEP)
 int keyIndex = 0;                 // your network key index number (needed only for WEP)
 
-IPAddress staticIP(192, 168, 1, 100);
+IPAddress ip(172,25,6,50);
+IPAddress gateway(172,25,1,82);
+IPAddress subnet(255,255,255,0);
 
 
 int status = WL_IDLE_STATUS;
 
 
-WiFiServer server(80);
+WiFiServer server(301);
 
 void waiter() {
   unsigned long waiter = millis();
@@ -98,11 +100,12 @@ void setup() {
   }
 
   String fv = WiFi.firmwareVersion();
+  Serial.println(fv);
   if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
     Serial.println("Please upgrade the firmware");
   }
 
-  WiFi.config(staticIP);
+  WiFi.config(ip, gateway, gateway, subnet);
 
   // attempt to connect to WiFi network:
   while (status != WL_CONNECTED) {
@@ -115,7 +118,6 @@ void setup() {
     waiter();
 
   }
-   WiFi.config(staticIP);
   server.begin();
   Serial.println(WiFi.localIP());
   // you're connected now, so print out the status:
@@ -200,11 +202,12 @@ void loop() {
   WiFiClient client = server.available();
   if (client) {
     Serial.println("new client");
-    while (client.connected()) {
+    while (client.connected()) {\
       while (client.available()) {
         char c = client.read();
+        client.println("sds");
+        Serial.print(c);
         Parser();
-        waiter();
       }
       gatherData();
     }
