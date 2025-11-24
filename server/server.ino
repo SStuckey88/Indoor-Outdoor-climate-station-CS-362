@@ -196,18 +196,34 @@ void Parser() {
 }
 
 
+char message[100];
+int index = 0;
 
 void loop() {
   // listen for incoming clients
   WiFiClient client = server.available();
   if (client) {
-    Serial.println("new client");
-    while (client.connected()) {\
-      while (client.available()) {
-        char c = client.read();
-        client.println("sds");
-        Serial.print(c);
-        Parser();
+    
+    //Serial.println("new client");
+    while (client.connected()) {
+      char c = ' ';
+      int numBytes = client.available();
+      index = 0;
+      while (numBytes>0 && c != ':' && index < 99) {
+        c = client.read();
+        if (c == ':') {
+          continue;
+        }
+        message[index] = c;
+        
+        index +=1;
+        numBytes-=1;
+
+      }
+      if (index > 0) {
+        message[index] = 0;
+        Serial.println(message);
+        client.print(message);
       }
       gatherData();
     }
@@ -215,7 +231,7 @@ void loop() {
 
     // close the connection:
     client.stop();
-    Serial.println("client disconnected");
+    //Serial.println("client disconnected");
   } else {
     gatherData();
   }

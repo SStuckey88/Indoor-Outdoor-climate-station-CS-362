@@ -52,7 +52,7 @@ IPAddress subnet(255,255,255,0);
 // Initialize the Ethernet client library
 // with the IP address and port of the server
 // that you want to connect to (port 80 is default for HTTP):
-WiFiSSLClient client;
+WiFiClient client;
 
 
 
@@ -142,38 +142,27 @@ void sendData() {
 
 }
 
+char message[100];
+int indexEnd;
+
 void gatherData() {
+  indexEnd = 0;
+
 
   unsigned long currentMillis = millis();
-  //Read Joystick data every 100ms - send to Pi if changed since last read
-    /*
-    if (currentMillis - previousMillis >= (interval*50)) {
-        if(timeStatus() == timeSet) {
-            time_t time = now();
-            unsigned long seconds = (unsigned long) time;
-            int result = dht11.readTemperatureHumidity(temp, hum);
-            barPres = pressureSensor.readFloatPressure();
-            tvoc = AGS.readPPB();
-
-            if (result == 0) {
-                sprintf(serialSend, "Dtime=%lu;temp=%d;hum=%d;pres=%.0f;tvoc=%d", seconds, temp, hum, barPres, tvoc);
-                Serial.println(serialSend);
-            } else {
-                // Print error message based on the error code.
-                Serial.println("ETemp/Humidity sensor connection failed");
-            }
-        } else {
-            requestTimeSync();
-        }
-        previousMillis = currentMillis;
-    }
-
-    if (Serial.available()) {
-        processSyncMessage();
-    } **/
 
 
- sendData();
+
+  //sprintf(message, "%ln;%ln;%ln:", data, data);
+
+
+
+
+  write_to_sd();
+}
+
+void write_to_sd() {
+  return;
 }
 
 int counter = 0;
@@ -193,9 +182,8 @@ void loop() {
 
     status = WiFi.begin(ssid, pass);
 
-    // wait 10 seconds for connection:
     unsigned long waiter = millis();
-    while (millis() - waiter < 10000) {
+    while (millis() - waiter < 100) {
         int x = 5;
     }
    
@@ -207,25 +195,27 @@ void loop() {
 
     Serial.println(counter);
     counter += 1;
-    if (client.connect(server, 301)) {
-        Serial.println("connected to server");
-        client.println("hi");
+
+    if (!client.connected())  {
+      client.connect(server, 301);
+    }
+    if (client.connected()) {
+      Serial.println("connected to server");
+      client.print("hi;did;you;know;that:This should be a different line:");
+      client.print(" :");
+
+    }
         //read_response();
         // Connect to WPA/WPA2 network.
 
         // wait 10 seconds for connection:
-        } 
+             
+  }
+
+  delay(100);
+  gatherData();
         
-        /*if (myFile) {
-            
-            myFile = SD.open("test.txt");
-            while (myFile.available()) {
-            client.println(myFile.read());
-            }*/
-                
-        }
-        
-    }
+  }
 
 
 
