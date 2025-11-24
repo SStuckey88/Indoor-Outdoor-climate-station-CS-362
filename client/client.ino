@@ -32,8 +32,8 @@ float barPres = 0.0;
 
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
-char ssid[] = "GovernmentSecurity";        // your network SSID (name)
-char pass[] = "5MfcrCw6";    // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "Maid Café";        // your network SSID (name)
+char pass[] = "Sysadmin24!";     // your network password (use for WPA, or use as key for WEP)
 int keyIndex = 0;                 // your network key index number (needed only for WEP)
 
 
@@ -41,12 +41,18 @@ int keyIndex = 0;                 // your network key index number (needed only 
 int status = WL_IDLE_STATUS;
 // if you don't want to use DNS (and reduce your sketch size)
 // use the numeric IP instead of the name for the server:
-IPAddress server(10, 197, 38, 188);  // numeric IP
+IPAddress server(172, 25, 6, 50);  // numeric IP
+
+IPAddress ip(172, 25, 6, 51);
+IPAddress gateway(172,25,1,82);
+IPAddress subnet(255,255,255,0);
+
+
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server
 // that you want to connect to (port 80 is default for HTTP):
-WiFiSSLClient client;
+WiFiClient client;
 
 
 
@@ -67,10 +73,6 @@ void read_response() {
     }
   }
 
-
-
-
-read_response();
 
   // if the server's disconnected, stop the client:
   if (!client.connected()) {
@@ -121,6 +123,7 @@ void setup() {
   }
 
   String fv = WiFi.firmwareVersion();
+  Serial.println(fv);
   if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
     Serial.println("Please upgrade the firmware");
   }
@@ -139,39 +142,30 @@ void sendData() {
 
 }
 
+char message[100];
+int indexEnd;
+
 void gatherData() {
+  indexEnd = 0;
+
 
   unsigned long currentMillis = millis();
-  //Read Joystick data every 100ms - send to Pi if changed since last read
-    /*
-    if (currentMillis - previousMillis >= (interval*50)) {
-        if(timeStatus() == timeSet) {
-            time_t time = now();
-            unsigned long seconds = (unsigned long) time;
-            int result = dht11.readTemperatureHumidity(temp, hum);
-            barPres = pressureSensor.readFloatPressure();
-            tvoc = AGS.readPPB();
-
-            if (result == 0) {
-                sprintf(serialSend, "Dtime=%lu;temp=%d;hum=%d;pres=%.0f;tvoc=%d", seconds, temp, hum, barPres, tvoc);
-                Serial.println(serialSend);
-            } else {
-                // Print error message based on the error code.
-                Serial.println("ETemp/Humidity sensor connection failed");
-            }
-        } else {
-            requestTimeSync();
-        }
-        previousMillis = currentMillis;
-    }
-
-    if (Serial.available()) {
-        processSyncMessage();
-    } **/
 
 
- sendData();
+
+  //sprintf(message, "%ln;%ln;%ln:", data, data);
+
+
+
+
+  write_to_sd();
 }
+
+void write_to_sd() {
+  return;
+}
+
+int counter = 0;
 
 
 
@@ -184,11 +178,12 @@ void loop() {
     Serial.print("Attempting to connect to SSID: ");
     Serial.println(ssid);
 
+    WiFi.config(ip, gateway, gateway, subnet); 
+
     status = WiFi.begin(ssid, pass);
 
-    // wait 10 seconds for connection:
     unsigned long waiter = millis();
-    while (millis() - waiter < 10000) {
+    while (millis() - waiter < 100) {
         int x = 5;
     }
    
@@ -198,46 +193,29 @@ void loop() {
     Serial.println("\nStarting connection to server...");
     // if you get a connection, report back via serial:
 
-    Serial.println(client.connect(server, 80));
-    if (false) {
-        Serial.println("connected to server");
+    Serial.println(counter);
+    counter += 1;
+
+    if (!client.connected())  {
+      client.connect(server, 301);
+    }
+    if (client.connected()) {
+      Serial.println("connected to server");
+      client.print("hi;did;you;know;that:This should be a different line:");
+      client.print(" :");
+
+    }
+        //read_response();
         // Connect to WPA/WPA2 network.
-        status = WiFi.begin(ssid, pass);
 
         // wait 10 seconds for connection:
-        unsigned long waiter = millis();
-        while (millis() - waiter < 10000) {
-            int x = 5;
-        } 
+             
+  }
+
+  delay(100);
+  gatherData();
         
-        /*if (myFile) {
-            
-            myFile = SD.open("test.txt");
-            while (myFile.available()) {
-            client.println(myFile.read());
-            }*/
-                
-        }
-        
-    }
+  }
 
 
-  
 
-  /*
-  if (second() != last_second) {
-  //read stuff and print message to file
-    Message newData;
-    newData.time = millis()
-    newData.light = analogueRead(A0)
-    newData.pressure = float P = bmp.readPressure()/3386.39;
-    newData.humidity = (float)DHT11.humidity
-    newData.temp = (float)DHT11.temperature;
-
-    myFile = SD.open("test.txt", FILE_WRITE);
-    myFile.println(newData);
-    last_second = second();
-  }*/
-
-
-}

@@ -46,17 +46,19 @@ int yPrev = 0;
 
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
-char ssid[] = "iPhone";        // your network SSID (name)
-char pass[] = "password362";    // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "Maid Café";        // your network SSID (name)
+char pass[] = "Sysadmin24!";    // your network password (use for WPA, or use as key for WEP)
 int keyIndex = 0;                 // your network key index number (needed only for WEP)
 
-IPAddress staticIP(192, 168, 1, 100);
+IPAddress ip(172,25,6,50);
+IPAddress gateway(172,25,1,82);
+IPAddress subnet(255,255,255,0);
 
 
 int status = WL_IDLE_STATUS;
 
 
-WiFiServer server(80);
+WiFiServer server(301);
 
 void waiter() {
   unsigned long waiter = millis();
@@ -98,11 +100,12 @@ void setup() {
   }
 
   String fv = WiFi.firmwareVersion();
+  Serial.println(fv);
   if (fv < WIFI_FIRMWARE_LATEST_VERSION) {
     Serial.println("Please upgrade the firmware");
   }
 
-  WiFi.config(staticIP);
+  WiFi.config(ip, gateway, gateway, subnet);
 
   // attempt to connect to WiFi network:
   while (status != WL_CONNECTED) {
@@ -115,7 +118,6 @@ void setup() {
     waiter();
 
   }
-   WiFi.config(staticIP);
   server.begin();
   Serial.println(WiFi.localIP());
   // you're connected now, so print out the status:
@@ -194,17 +196,34 @@ void Parser() {
 }
 
 
+char message[100];
+int index = 0;
 
 void loop() {
   // listen for incoming clients
   WiFiClient client = server.available();
   if (client) {
-    Serial.println("new client");
+    
+    //Serial.println("new client");
     while (client.connected()) {
-      while (client.available()) {
-        char c = client.read();
-        Parser();
-        waiter();
+      char c = ' ';
+      int numBytes = client.available();
+      index = 0;
+      while (numBytes>0 && c != ':' && index < 99) {
+        c = client.read();
+        if (c == ':') {
+          continue;
+        }
+        message[index] = c;
+        
+        index +=1;
+        numBytes-=1;
+
+      }
+      if (index > 0) {
+        message[index] = 0;
+        Serial.println(message);
+        client.print(message);
       }
       gatherData();
     }
@@ -212,7 +231,7 @@ void loop() {
 
     // close the connection:
     client.stop();
-    Serial.println("client disconnected");
+    //Serial.println("client disconnected");
   } else {
     gatherData();
   }
