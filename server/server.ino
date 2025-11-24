@@ -42,7 +42,8 @@ int xVal = 0;
 int yVal = 0;
 int xPrev = 0;
 int yPrev = 0;
-
+ 
+int temporary = 0;
 
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
