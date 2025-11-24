@@ -46,12 +46,12 @@ int yPrev = 0;
 
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
-char ssid[] = "Maid Café";        // your network SSID (name)
-char pass[] = "Sysadmin24!";    // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "Linksys23718";        // your network SSID (name)
+char pass[] = "kmdjfy9qcn";       // your network password (use for WPA, or use as key for WEP)
 int keyIndex = 0;                 // your network key index number (needed only for WEP)
 
-IPAddress ip(172,25,6,50);
-IPAddress gateway(172,25,1,82);
+IPAddress ip(192,168,1,102);
+IPAddress gateway(192,168,1,1);
 IPAddress subnet(255,255,255,0);
 
 
