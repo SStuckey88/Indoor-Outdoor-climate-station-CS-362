@@ -1,11 +1,7 @@
 import sqlite3
 import serial
 from datetime import datetime
-<<<<<<< HEAD
 from queue import Queue
-=======
-from time import sleep
->>>>>>> ad49c6db0e78734bd1c8577686afef5d89eb7cd6
 #table: climate
 #CREATE TABLE climate(timestamp REAL, inTemp INT, inHum INT, inAirQuality INT, outTemp INT, outHum INT, outpressure REAL);
 
@@ -37,11 +33,7 @@ def openSerialPort(portName, baudRate, timeout):
         return None
 
 #def main():
-<<<<<<< HEAD
 def connect(q):
-=======
-def connect():
->>>>>>> ad49c6db0e78734bd1c8577686afef5d89eb7cd6
     ser = openSerialPort(SERIAL_PORT, BAUD_RATE, TIMEOUT)
     
     while True:
@@ -67,13 +59,10 @@ def connect():
                 print("Serial Error!")
         else:
             ser = openSerialPort(SERIAL_PORT, BAUD_RATE, TIMEOUT)
-<<<<<<< HEAD
             
         if not q.empty():
             input = q.get()
             print(input)
-=======
->>>>>>> ad49c6db0e78734bd1c8577686afef5d89eb7cd6
 
 # if __name__ == '__main__':
 #     main()
