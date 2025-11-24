@@ -103,23 +103,6 @@ void setup() {
     Serial.println("Please upgrade the firmware");
   }
 
-  WiFi.config(ip, gateway, gateway, subnet);
-
-  // attempt to connect to WiFi network:
-  while (status != WL_CONNECTED) {
-    Serial.print("Attempting to connect to SSID: ");
-    Serial.println(ssid);
-    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
-    status = WiFi.begin(ssid, pass);
-    Serial.println(status);
-    // wait 10 seconds for connection:
-    waiter();
-
-  }
-  server.begin();
-  Serial.println(WiFi.localIP());
-  // you're connected now, so print out the status:
-  printWifiStatus();
 }
 
 
@@ -129,7 +112,7 @@ void setup() {
 void gatherData() {
 
   unsigned long currentMillis = millis();
-  //Read Joystick data every 100ms - send to Pi if changed since last read
+  //Read Joystick data every 100ms - send to Pi if changed since last rea
     if (currentMillis - previousJoystickMillis >= interval) {
         xRead = analogRead(JoyXPin);
         yRead = analogRead(JoyYPin);
@@ -193,12 +176,52 @@ void Parser() {
   sendData();
 }
 
+void printWifiStatus() {
+  // print the SSID of the network you're attached to:
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+
+  // print your board's IP address:
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+
+  // print the received signal strength:
+  long rssi = WiFi.RSSI();
+  Serial.print("signal strength (RSSI):");
+  Serial.print(rssi);
+  Serial.println(" dBm");
+}
+
 
 char message[100];
 int index = 0;
 
 void loop() {
   // listen for incoming clients
+
+  if (status != WL_CONNECTED) {
+    WiFi.config(ip, gateway, gateway, subnet);
+
+  // attempt to connect to WiFi network:
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
+    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
+    status = WiFi.begin(ssid, pass);
+    Serial.println(status);
+    // wait 10 seconds for connection:
+    waiter();
+
+  
+    server.begin();
+    Serial.println(WiFi.localIP());
+    // you're connected now, so print out the status:
+    printWifiStatus();
+    gatherData();
+    return;
+  
+  }
+
   WiFiClient client = server.available();
   if (client) {
     
@@ -239,20 +262,3 @@ void loop() {
   //send to pi
 }
 
-
-void printWifiStatus() {
-  // print the SSID of the network you're attached to:
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
-
-  // print your board's IP address:
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
-
-  // print the received signal strength:
-  long rssi = WiFi.RSSI();
-  Serial.print("signal strength (RSSI):");
-  Serial.print(rssi);
-  Serial.println(" dBm");
-}
