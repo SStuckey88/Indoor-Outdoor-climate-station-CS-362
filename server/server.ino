@@ -46,8 +46,8 @@ int yPrev = 0;
 
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
-char ssid[] = "GovernmentSecurity";        // your network SSID (name)
-char pass[] = "5MfcrCw6";    // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "iPhone";        // your network SSID (name)
+char pass[] = "password362";    // your network password (use for WPA, or use as key for WEP)
 int keyIndex = 0;                 // your network key index number (needed only for WEP)
 
 IPAddress staticIP(192, 168, 1, 100);
