@@ -114,6 +114,8 @@ void setup() {
   if (!SD.begin(chipSelect)) {
     digitalWrite(3, HIGH);
   }
+
+  SD.remove("test.txt");
   
 
   
@@ -159,6 +161,7 @@ void gatherData() {
   sprintf(message, "hi;data;%d:", out);
   out +=1;
   //sprintf(message, "%ln;%ln;%ln:", data, data);
+  Serial.println(message);
 
 
 
@@ -217,7 +220,6 @@ void loop() {
         // read from the file until there's nothing else in it:
         while (myFile.available()) {
           client.write(myFile.read());
-          delay(100);
         }
         // close the file:
         myFile.close();
