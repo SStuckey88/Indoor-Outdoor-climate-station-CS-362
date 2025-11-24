@@ -8,7 +8,7 @@
   https://docs.arduino.cc/tutorials/uno-r4-wifi/wifi-examples#wi-fi-web-client-ssl
 */
 
-
+#include <SD.h>
 #include <WiFiS3.h>
 #include <DHT11.h>
 #include <AGS02MA.h>
@@ -56,6 +56,9 @@ IPAddress subnet(255,255,255,0);
 WiFiClient client;
 
 
+const int chipSelect = 10;
+File myFile;
+
 
 /* just wrap the received data up to 80 columns in the serial print*/
 /* -------------------------------------------------------------------------- */
@@ -101,20 +104,19 @@ void printWifiStatus() {
   Serial.println(" dBm");
 }
 
-int myFile;
 /* -------------------------------------------------------------------------- */
 void setup() {
 /* -------------------------------------------------------------------------- */
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
+
+
+  if (!SD.begin(chipSelect)) {
+    digitalWrite(3, HIGH);
+  }
   
 
-  /*if (!SD.begin(4)) {
-    Serial.println("initialization failed!");
-    while (1);
-  }
-
-  myFile = SD.open("test.txt", FILE_WRITE);*/
+  
 
   // check for the WiFi module:
   if (WiFi.status() == WL_NO_MODULE) {
@@ -145,6 +147,7 @@ void sendData() {
 
 char message[100];
 int indexEnd;
+int out = 0;
 
 void gatherData() {
   indexEnd = 0;
@@ -153,7 +156,8 @@ void gatherData() {
   unsigned long currentMillis = millis();
 
 
-
+  sprintf(message, "hi;data;%d:", out);
+  out +=1;
   //sprintf(message, "%ln;%ln;%ln:", data, data);
 
 
@@ -163,6 +167,10 @@ void gatherData() {
 }
 
 void write_to_sd() {
+
+  myFile = SD.open("test.txt", FILE_WRITE);
+  myFile.println(message);
+  myFile.close();
   return;
 }
 
@@ -202,8 +210,22 @@ void loop() {
     }
     if (client.connected()) {
       Serial.println("connected to server");
-      client.print("hi;did;you;know;that:This should be a different line:");
-      client.print(" :");
+      myFile = SD.open("test.txt");
+      if (myFile) {
+        Serial.println("test.txt:");
+
+        // read from the file until there's nothing else in it:
+        while (myFile.available()) {
+          client.write(myFile.read());
+          delay(100);
+        }
+        // close the file:
+        myFile.close();
+        SD.remove("test.txt");
+      } else {
+        // if the file didn't open, print an error:
+        Serial.println("error opening test.txt");
+      }
 
     }
         //read_response();
@@ -213,7 +235,7 @@ void loop() {
              
   }
 
-  delay(100);
+  
   gatherData();
         
   }
