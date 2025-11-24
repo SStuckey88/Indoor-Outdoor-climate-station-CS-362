@@ -16,9 +16,8 @@
 #include <AGS02MA.h>
 #include <TimeLib.h>
 #include <Wire.h>
-#include <SparkFunBME280.h>
 
-BME280 pressureSensor;
+//BME280 pressureSensor;
 DHT11 dht11(2);
 AGS02MA AGS(26);
 
@@ -30,7 +29,6 @@ char serialSend[100];
 int temp = 0;
 int hum = 0;
 int tvoc = 0;
-float barPres = 0.0;
 
 unsigned long previousMillis = 0;
 unsigned long previousJoystickMillis = 0;
@@ -44,7 +42,6 @@ int xPrev = 0;
 int yPrev = 0;
  
 int temporary = 0;
-
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
 char ssid[] = "Linksys23718";        // your network SSID (name)
@@ -81,8 +78,8 @@ void setup() {
 
   dht11.setDelay(10);
     
-  pressureSensor.setI2CAddress(0x76);
-  if(pressureSensor.beginI2C() == false) Serial.println("EBarometric Pressure sensor connection failed");
+  //pressureSensor.setI2CAddress(0x76);
+  //if(pressureSensor.beginI2C() == false) Serial.println("EBarometric Pressure sensor connection failed");
 
   setSyncProvider(requestTimeSync); 
 
@@ -152,11 +149,11 @@ void gatherData() {
             time_t time = now();
             unsigned long seconds = (unsigned long) time;
             int result = dht11.readTemperatureHumidity(temp, hum);
-            barPres = pressureSensor.readFloatPressure();
+            //barPres = pressureSensor.readFloatPressure();
             tvoc = AGS.readPPB();
 
             if (result == 0) {
-                sprintf(serialSend, "Dtime=%lu;temp=%d;hum=%d;pres=%.0f;tvoc=%d", seconds, temp, hum, barPres, tvoc);
+                sprintf(serialSend, "Dtime=%lu;inTemp=%d;inHum=%d;tvoc=%d", seconds, temp, hum, tvoc);
                 Serial.println(serialSend);
             } else {
                 // Print error message based on the error code.
