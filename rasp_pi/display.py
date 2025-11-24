@@ -63,16 +63,11 @@ def page():
             currDatetime = datetime.fromtimestamp(row[0])
             currTime = currDatetime.strftime("%I:%M")
             currDate = currDatetime.date()
-<<<<<<< HEAD
+
             if(currDate == datetime.now().date()):
                 x.append(currTime)
                 tempY.append(row[1])
                 humY.append(row[2])
-=======
-            x.append(currTime)
-            tempY.append(row[1])
-            humY.append(row[2])
->>>>>>> ad49c6db0e78734bd1c8577686afef5d89eb7cd6
             
         tempChart.options['series'][0]['data'] = tempY
         tempChart.options['xAxis']['name'] = currDate
