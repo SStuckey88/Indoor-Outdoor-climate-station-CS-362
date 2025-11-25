@@ -124,7 +124,7 @@ void setup() {
 
   SD.remove("test.txt");
   
-
+  
   
 
   // check for the WiFi module:
@@ -133,6 +133,8 @@ void setup() {
     // don't continue
     while (true);
   }
+
+  WiFi.setTimeout(3);
 
   String fv = WiFi.firmwareVersion();
   Serial.println(fv);
