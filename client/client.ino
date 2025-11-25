@@ -272,7 +272,7 @@ void loop() {
 
           recieved[index] = '\0';
 
-          pctime = STD::stoull(recieved);
+          pctime = std::stoull(recieved);
           setTime(pctime);
         } 
 
