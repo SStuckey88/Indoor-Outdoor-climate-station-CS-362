@@ -21,10 +21,6 @@
 DHT11 dht11(2);
 AGS02MA AGS(26);
 
-#define DHT11_PIN 6
-
-DHT dht11(DHT11_PIN, DHT11);
-
 int JoyXPin = A0;
 int JoyYPin = A1;
 
@@ -74,6 +70,12 @@ void sendData() {
 
 }
 
+time_t requestTimeSync()
+{
+  Serial.println("T");  
+  return 0; // the time will be sent later in response to serial mesg
+}
+
 void setup() {
 
   Serial.begin(9600);
@@ -81,7 +83,6 @@ void setup() {
   Wire.begin();
 
   dht11.setDelay(10);
-  dht11.begin();
     
   //pressureSensor.setI2CAddress(0x76);
   //if(pressureSensor.beginI2C() == false) Serial.println("EBarometric Pressure sensor connection failed");
@@ -110,6 +111,17 @@ void setup() {
 
 }
 
+int timesetter = 0;
+void processSyncMessage() {
+  unsigned long pctime;
+
+  if(Serial.find('T')) {
+    //setTime(int hr,int min,int sec,int day, int month, int yr);
+     pctime = Serial.parseInt();
+    setTime(pctime); // Sync Arduino clock to the time received on the serial port
+    timesetter = 1;
+  }
+}
 
 
 
@@ -161,23 +173,9 @@ void gatherData() {
  sendData();
 }
 
-time_t requestTimeSync()
-{
-  Serial.println("T");  
-  return 0; // the time will be sent later in response to serial mesg
-}
 
-int timesetter = 0
-void processSyncMessage() {
-  unsigned long pctime;
 
-  if(Serial.find('T')) {
-    //setTime(int hr,int min,int sec,int day, int month, int yr);
-     pctime = Serial.parseInt();
-    setTime(pctime); // Sync Arduino clock to the time received on the serial port
-    timesetter = 1;
-  }
-}
+
 
 void Parser() {
   sendData();
@@ -252,9 +250,10 @@ void loop() {
         message[index] = 0;
         Serial.println(message);
         if(timesetter == 1) {
-          client.print("%ld:", now());
+          char sendback[50];
+          sprintf(sendback, "%ld:", now());
+          client.print(sendback);
         }
-        client.print(message);
       }
       gatherData();
     }

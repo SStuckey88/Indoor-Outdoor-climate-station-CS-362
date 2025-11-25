@@ -9,6 +9,7 @@
 */
 
 #include <SD.h>
+#include <stdlib.h>
 #include <WiFiS3.h>
 #include <DHT11.h>
 #include <AGS02MA.h>
@@ -63,9 +64,6 @@ File myFile;
 
 
 
-#define DHT11_PIN 6
-
-DHT dht11(DHT11_PIN, DHT11);
 
 /* just wrap the received data up to 80 columns in the serial print*/
 /* -------------------------------------------------------------------------- */
@@ -117,7 +115,8 @@ void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
 
-  dht11.begin();
+  Wire.begin();
+  dht11.setDelay(10);
 
   if (!SD.begin(chipSelect)) {
     digitalWrite(3, HIGH);
@@ -164,6 +163,7 @@ long interval = 100;
 
 void gatherData() {
   indexEnd = 0;
+  unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= (interval*50))  {
             time_t time = now();
             unsigned long seconds = (unsigned long) time;
@@ -182,7 +182,7 @@ void gatherData() {
             }
   }
 
-  unsigned long currentMillis = millis();
+  
 
 
   sprintf(message, "hi;data;%d:", out);
@@ -254,7 +254,8 @@ void loop() {
         
 
         int numBytes = client.available();
-        index = 0;
+        char c;
+        int index = 0;
         while (numBytes>0 && c != ':' && index < 99) {
           c = client.read();
           if (c == ':') {
@@ -269,9 +270,9 @@ void loop() {
         if (index > 0) {
           unsigned long pctime;
 
-          recieved[index] = '\0'
+          recieved[index] = '\0';
 
-          pctime = stoull(recieved)
+          pctime = STD::stoull(recieved);
           setTime(pctime);
         } 
 
