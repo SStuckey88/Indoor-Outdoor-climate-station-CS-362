@@ -162,6 +162,7 @@ time_t requestTimeSync()
   return 0; // the time will be sent later in response to serial mesg
 }
 
+int timesetter = 0
 void processSyncMessage() {
   unsigned long pctime;
 
@@ -169,6 +170,7 @@ void processSyncMessage() {
     //setTime(int hr,int min,int sec,int day, int month, int yr);
      pctime = Serial.parseInt();
     setTime(pctime); // Sync Arduino clock to the time received on the serial port
+    timesetter = 1;
   }
 }
 
@@ -244,6 +246,9 @@ void loop() {
       if (index > 0) {
         message[index] = 0;
         Serial.println(message);
+        if(timesetter == 1) {
+          client.print("%ld:", now());
+        }
         client.print(message);
       }
       gatherData();

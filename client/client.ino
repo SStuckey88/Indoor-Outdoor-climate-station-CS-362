@@ -179,6 +179,7 @@ void write_to_sd() {
 
 int counter = 0;
 
+char recieved[100];
 
 
 /* -------------------------------------------------------------------------- */
@@ -223,6 +224,33 @@ void loop() {
         }
         // close the file:
         myFile.close();
+        
+
+        int numBytes = client.available();
+        index = 0;
+        while (numBytes>0 && c != ':' && index < 99) {
+          c = client.read();
+          if (c == ':') {
+            continue;
+          }
+          recieved[index] = c;
+          
+          index +=1;
+          numBytes-=1;
+
+        }
+        if (index > 0) {
+          unsigned long pctime;
+
+          recieved[index] = '\0'
+
+          pctime = stoull(recieved)
+          setTime(pctime);
+        } 
+
+
+
+
         SD.remove("test.txt");
       } else {
         // if the file didn't open, print an error:
