@@ -21,6 +21,10 @@
 DHT11 dht11(2);
 AGS02MA AGS(26);
 
+#define DHT11_PIN 6
+
+DHT dht11(DHT11_PIN, DHT11);
+
 int JoyXPin = A0;
 int JoyYPin = A1;
 
@@ -77,6 +81,7 @@ void setup() {
   Wire.begin();
 
   dht11.setDelay(10);
+  dht11.begin();
     
   //pressureSensor.setI2CAddress(0x76);
   //if(pressureSensor.beginI2C() == false) Serial.println("EBarometric Pressure sensor connection failed");

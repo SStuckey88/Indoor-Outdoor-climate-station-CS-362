@@ -30,6 +30,8 @@ int hum = 0;
 int tvoc = 0;
 float barPres = 0.0;
 
+int lightPin = A0;
+
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
 char ssid[] = "Linksys23718";        // your network SSID (name)
@@ -59,6 +61,11 @@ WiFiClient client;
 const int chipSelect = 10;
 File myFile;
 
+
+
+#define DHT11_PIN 6
+
+DHT dht11(DHT11_PIN, DHT11);
 
 /* just wrap the received data up to 80 columns in the serial print*/
 /* -------------------------------------------------------------------------- */
@@ -110,6 +117,7 @@ void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
 
+  dht11.begin();
 
   if (!SD.begin(chipSelect)) {
     digitalWrite(3, HIGH);
@@ -150,10 +158,29 @@ void sendData() {
 char message[100];
 int indexEnd;
 int out = 0;
+unsigned long previousMillis = 0;
+unsigned long previousJoystickMillis = 0;
+long interval = 100;
 
 void gatherData() {
   indexEnd = 0;
+  if (currentMillis - previousMillis >= (interval*50))  {
+            time_t time = now();
+            unsigned long seconds = (unsigned long) time;
+            int result = dht11.readTemperatureHumidity(temp, hum);
+            //barPres = pressureSensor.readFloatPressure();
+            //tvoc = AGS.readPPB();
+            int light = analogRead(lightPin);
 
+            if (result == 0) {
+                sprintf(serialSend, "Dtime=%lu;inTemp=%d;inHum=%d;press=%d;light=%d:", seconds, temp, hum, 0, 0,light);
+                Serial.println(serialSend);
+            } else {
+                // Print error message based on the error code.
+                Serial.println("ETemp/Humidity sensor connection failed");
+            
+            }
+  }
 
   unsigned long currentMillis = millis();
 
