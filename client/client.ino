@@ -173,7 +173,7 @@ void gatherData() {
             int light = analogRead(lightPin);
 
             if (result == 0) {
-                sprintf(serialSend, "Dtime=%lu;inTemp=%d;inHum=%d;press=%d;light=%d:", seconds, temp, hum, 0, 0,light);
+                sprintf(serialSend, "Otime=%lu;temp=%d;hum=%d;press=%d;light=%d:", seconds, temp, hum, 0,light);
                 Serial.println(serialSend);
             } else {
                 // Print error message based on the error code.

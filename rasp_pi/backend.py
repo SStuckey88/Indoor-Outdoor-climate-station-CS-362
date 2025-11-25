@@ -19,6 +19,16 @@ def insertClimateData(data):
     con.commit()
     con.close()
     
+def insertOutdoorClimateData(data):
+    
+    con = sqlite3.connect("climatedata.db")
+    cur = con.cursor()
+    cur.execute(f'''INSERT INTO oClimate
+                (timestamp, temp, hum, light, press) 
+                values({data['time']}, {data['temp']}, {data['hum']}, {data['light']}, {data['press']})''')
+    con.commit()
+    con.close()
+    
 def openSerialPort(portName, baudRate, timeout):
     try:
         ser = serial.Serial(portName, baudRate, timeout=timeout)
@@ -50,6 +60,10 @@ def connect(q):
                     elif(firstChar == 'D'):
                         data = dict(item.split("=") for item in message.split(";"))
                         insertClimateData(data)
+                        print(message)
+                    elif(firstChar == 'O'):
+                        data = dict(item.split("=") for item in message.split(";"))
+                        insertOutdoorClimateData(data)
                         print(message)
                     elif(firstChar == 'J'):
                         print(message)
