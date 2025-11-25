@@ -134,7 +134,7 @@ void setup() {
     while (true);
   }
 
-  WiFi.setTimeout(3);
+  WiFi.setTimeout(3000);
 
   String fv = WiFi.firmwareVersion();
   Serial.println(fv);
@@ -167,41 +167,37 @@ void gatherData() {
   indexEnd = 0;
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= (interval*50))  {
-            time_t time = now();
-            unsigned long seconds = (unsigned long) time;
-            int result = dht11.readTemperatureHumidity(temp, hum);
-            //barPres = pressureSensor.readFloatPressure();
-            //tvoc = AGS.readPPB();
-            int light = analogRead(lightPin);
+    time_t time = now();
+    unsigned long seconds = (unsigned long) time;
+    int result = dht11.readTemperatureHumidity(temp, hum);
+    //barPres = pressureSensor.readFloatPressure();
+    //tvoc = AGS.readPPB();
+    int light = analogRead(lightPin);
 
-            if (result == 0) {
-                sprintf(serialSend, "Otime=%lu;temp=%d;hum=%d;press=%d;light=%d:", seconds, temp, hum, 0,light);
-                Serial.println(serialSend);
-            } else {
-                // Print error message based on the error code.
-                Serial.println("ETemp/Humidity sensor connection failed");
-            
-            }
-  }
+    if (result == 0) {
+        sprintf(serialSend, "Otime=%lu;temp=%d;hum=%d;press=%d;light=%d:", seconds, temp, hum, 0,light);
+        Serial.println(serialSend);
+    } else {
+        // Print error message based on the error code.
+        Serial.println("ETemp/Humidity sensor connection failed");
+    
+    }
+    previousMillis = currentMillis;
+    write_to_sd();
+}
 
   
 
 
-  sprintf(message, "hi;data;%d:", out);
-  out +=1;
-  //sprintf(message, "%ln;%ln;%ln:", data, data);
-  Serial.println(message);
 
 
-
-
-  write_to_sd();
+  
 }
 
 void write_to_sd() {
 
   myFile = SD.open("test.txt", FILE_WRITE);
-  myFile.println(message);
+  myFile.println(serialSend);
   myFile.close();
   return;
 }
@@ -238,11 +234,13 @@ void loop() {
     Serial.println(counter);
     counter += 1;
 
+    if (SD.exists("test.txt")) {
     if (!client.connected())  {
       client.connect(server, 301);
     }
     if (client.connected()) {
       Serial.println("connected to server");
+      
       myFile = SD.open("test.txt");
       if (myFile) {
         Serial.println("test.txt:");
@@ -282,10 +280,13 @@ void loop() {
 
 
         SD.remove("test.txt");
-      } else {
+      
+        } else {
         // if the file didn't open, print an error:
         Serial.println("error opening test.txt");
       }
+      }
+      
 
     }
         //read_response();

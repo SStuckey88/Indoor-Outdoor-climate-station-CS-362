@@ -201,10 +201,11 @@ void printWifiStatus() {
 
 char message[100];
 int index = 0;
+int found = 0;
 
 void loop() {
   // listen for incoming clients
-
+  found = 0;
   if (status != WL_CONNECTED) {
     WiFi.config(ip, gateway, gateway, subnet);
 
@@ -235,10 +236,13 @@ void loop() {
       char c = ' ';
       int numBytes = client.available();
       index = 0;
+
       while (numBytes>0 && c != ':' && index < 99) {
         c = client.read();
         if (c == ':') {
+          found = 1;
           continue;
+          
         }
         message[index] = c;
         
@@ -246,8 +250,29 @@ void loop() {
         numBytes-=1;
 
       }
-      if (index > 0) {
+      if (found == 0) {
+        waiter();
+        int numBytes = client.available();
+        while (numBytes>0 && c != ':' && index < 99) {
+        c = client.read();
+        if (c == ':') {
+          found = 1;
+          continue;
+          
+        }
+        message[index] = c;
+        
+        index +=1;
+        numBytes-=1;
+
+      }
+
+
+      }
+
+      if (index > 0 && found == 1) {
         message[index] = 0;
+        sprintf(message, "%s:", message);
         Serial.println(message);
         if(timesetter == 1) {
           char sendback[50];
