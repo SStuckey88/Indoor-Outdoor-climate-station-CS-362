@@ -21,9 +21,6 @@
 DHT11 dht11(2);
 AGS02MA AGS(26);
 
-int JoyXPin = A0;
-int JoyYPin = A1;
-
 char serialSend[100];
 
 int temp = 0;
@@ -33,19 +30,16 @@ int tvoc = 0;
 unsigned long previousMillis = 0;
 unsigned long previousJoystickMillis = 0;
 long interval = 100;
-
-int xRead = 0;
-int yRead = 0;
-int xVal = 0;
-int yVal = 0;
-int xPrev = 0;
-int yPrev = 0;
  
 int temporary = 0;
 
+bool sendingMessage = false;
+
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
-char ssid[] = "Linksys23718";        // your network SSID (name)
-char pass[] = "kmdjfy9qcn";       // your network password (use for WPA, or use as key for WEP)
+//char ssid[] = "Linksys23718";        // your network SSID (name)
+//char pass[] = "kmdjfy9qcn";       // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "Treyney WiFi"; 
+char pass[] = "Bardo3434";
 int keyIndex = 0;                 // your network key index number (needed only for WEP)
 
 IPAddress ip(192,168,1,102);
@@ -72,7 +66,7 @@ void sendData() {
 
 time_t requestTimeSync()
 {
-  Serial.println("T");  
+  Serial.println("T:");  
   return 0; // the time will be sent later in response to serial mesg
 }
 
@@ -129,35 +123,21 @@ void processSyncMessage() {
 void gatherData() {
 
   unsigned long currentMillis = millis();
-  //Read Joystick data every 100ms - send to Pi if changed since last rea
-    if (currentMillis - previousJoystickMillis >= interval) {
-        xRead = analogRead(JoyXPin);
-        yRead = analogRead(JoyYPin);
-        xVal = map(xRead, 0, 1023, -1, 1);
-        yVal = map(yRead, 0, 1023, 1, -1);
-        if(xVal != xPrev || yVal != yPrev) {
-            sprintf(serialSend, "Jx=%d;y=%d", xVal, yVal);
-            Serial.println(serialSend);
-            xPrev = xVal;
-            yPrev = yVal;
-        }
-        previousJoystickMillis = currentMillis;
-    }
 
     if (currentMillis - previousMillis >= (interval*50)) {
         if(timeStatus() == timeSet) {
             time_t time = now();
             unsigned long seconds = (unsigned long) time;
             int result = dht11.readTemperatureHumidity(temp, hum);
-            //barPres = pressureSensor.readFloatPressure();
             tvoc = AGS.readPPB();
-
-            if (result == 0) {
-                sprintf(serialSend, "Dtime=%lu;inTemp=%d;inHum=%d;tvoc=%d", seconds, temp, hum, tvoc);
-                Serial.println(serialSend);
-            } else {
-                // Print error message based on the error code.
-                Serial.println("ETemp/Humidity sensor connection failed");
+            if(!sendingMessage) {
+              if (result == 0) {
+                  sprintf(serialSend, "Dtime=%lu;inTemp=%d;inHum=%d;tvoc=%d:", seconds, temp, hum, tvoc);
+                  Serial.println(serialSend);
+              } else {
+                  // Print error message based on the error code.
+                  Serial.println("ETemp/Humidity sensor connection failed");
+              }
             }
         } else {
             requestTimeSync();
@@ -231,54 +211,47 @@ void loop() {
   WiFiClient client = server.available();
   if (client) {
     
-    //Serial.println("new client");
+    Serial.println("new client");
     while (client.connected()) {
+      // if(client.available()) {
+      //   char test[50];
+      //   for(int i = 0; i < 50; i++) {
+      //     test[i] = client.read();
+      //   }
+      //   char message[50] = "";
+      //   sprintf(message, "%s", test);
+      //   Serial.write(message);
+      // }
+
       char c = ' ';
       int numBytes = client.available();
       index = 0;
 
-      while (numBytes>0 && c != ':' && index < 99) {
+      while (numBytes>0 && index < 50) {
         c = client.read();
-        if (c == ':') {
-          found = 1;
-          continue;
-          
-        }
         message[index] = c;
         
         index +=1;
         numBytes-=1;
 
-      }
-      if (found == 0) {
-        waiter();
-        int numBytes = client.available();
-        while (numBytes>0 && c != ':' && index < 99) {
-        c = client.read();
-        if (c == ':') {
+        if (c == '\n') {
           found = 1;
           continue;
           
         }
-        message[index] = c;
         
-        index +=1;
-        numBytes-=1;
-
-      }
-
-
       }
 
       if (index > 0 && found == 1) {
         message[index] = 0;
-        sprintf(message, "%s:", message);
-        Serial.println(message);
+        sprintf(message, "%s", message);
+        Serial.print(message);
         if(timesetter == 1) {
           char sendback[50];
           sprintf(sendback, "%ld:", now());
           client.print(sendback);
         }
+        found == 0;
       }
       gatherData();
     }
@@ -286,7 +259,7 @@ void loop() {
 
     // close the connection:
     client.stop();
-    //Serial.println("client disconnected");
+    Serial.println("client disconnected");
   } else {
     gatherData();
   }

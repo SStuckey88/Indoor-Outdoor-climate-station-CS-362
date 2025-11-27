@@ -2,30 +2,30 @@ import sqlite3
 import serial
 from datetime import datetime
 from queue import Queue
-#table: climate
-#CREATE TABLE climate(timestamp REAL, inTemp INT, inHum INT, inAirQuality INT, outTemp INT, outHum INT, outpressure REAL);
+# CREATE TABLE indoor(timestamp REAL, temp INT, hum INT, airQuality INT);
+# CREATE TABLE outdoor(timestamp REAL, temp INT, hum INT, press REAL, light INT);
 
 SERIAL_PORT = '/dev/ttyACM0'
 BAUD_RATE = 9600
-TIMEOUT = 1
+TIMEOUT = 3
 
-def insertClimateData(data):
+def insertIndoorData(data):
     
     con = sqlite3.connect("climatedata.db")
     cur = con.cursor()
-    cur.execute(f'''INSERT INTO climate 
-                (timestamp, inTemp, inHum, inAirQuality) 
+    cur.execute(f'''INSERT INTO indoor 
+                (timestamp, temp, hum, airQuality) 
                 values({data['time']}, {data['inTemp']}, {data['inHum']}, {data['tvoc']})''')
     con.commit()
     con.close()
     
-def insertOutdoorClimateData(data):
+def insertOutdoorData(data):
     
     con = sqlite3.connect("climatedata.db")
     cur = con.cursor()
-    cur.execute(f'''INSERT INTO oClimate
+    cur.execute(f'''INSERT INTO outdoor
                 (timestamp, temp, hum, light, press) 
-                values({data['time']}, {data['temp']}, {data['hum']}, {data['light']}, {data['press']})''')
+                values({data['time']}, {data['temp']}, {data['hum']}, {data['press']}, {data['light']})''')
     con.commit()
     con.close()
     
@@ -45,30 +45,36 @@ def openSerialPort(portName, baudRate, timeout):
 #def main():
 def connect(q):
     ser = openSerialPort(SERIAL_PORT, BAUD_RATE, TIMEOUT)
-    
+    line = ""
     while True:
         if ser:
             try:
                 if ser.in_waiting > 0:
-                    line = ser.readline().decode('utf-8').rstrip()
+                    line = ser.readline().decode('utf-8')
                     firstChar = line[0]
-                    message = line[1:]
+                    message = line[1:].replace(":", "").strip()
                     if(firstChar == 'T'):
                         timestamp = 'T' + str(datetime.now().timestamp())
                         ser.write(timestamp.encode())
-                        print(message)
                     elif(firstChar == 'D'):
-                        data = dict(item.split("=") for item in message.split(";"))
-                        insertClimateData(data)
+                        data = splitData(message)
+                        if data != None:
+                            try:
+                                insertIndoorData(data)
+                            except:
+                                continue
                         print(message)
                     elif(firstChar == 'O'):
-                        data = dict(item.split("=") for item in message.split(";"))
-                        insertOutdoorClimateData(data)
-                        print(message)
-                    elif(firstChar == 'J'):
+                        data = splitData(message)
+                        if data != None:
+                            try:
+                                insertOutdoorData(data)
+                            except:
+                                continue
                         print(message)
                     else:
-                        print(message)
+                        print(line)
+                    
             except serial.SerialException as e:
                 print("Serial Error!")
         else:
@@ -77,6 +83,10 @@ def connect(q):
         if not q.empty():
             input = q.get()
             print(input)
-
-# if __name__ == '__main__':
-#     main()
+            
+def splitData(message):
+    try:
+        data = dict(item.split("=") for item in message.split(";"))
+        return data
+    except:
+        return None

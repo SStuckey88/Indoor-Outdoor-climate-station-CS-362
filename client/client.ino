@@ -15,28 +15,34 @@
 #include <AGS02MA.h>
 #include <TimeLib.h>
 #include <Wire.h>
-#include <SparkFunBME280.h>
+#include <BME280I2C.h>
 
-BME280 pressureSensor;
+BME280I2C bme;
 DHT11 dht11(2);
 AGS02MA AGS(26);
 
 
 int lastSecond = 0;
 
-char serialSend[100];
+char serialSend[50];
 
 int temp = 0;
 int hum = 0;
 int tvoc = 0;
-float barPres = 0.0;
+
+float bmeTemp(NAN), bmeHum(NAN), bmePres(NAN);
+
+BME280::TempUnit tempUnit(BME280::TempUnit_Celsius);
+BME280::PresUnit presUnit(BME280::PresUnit_Pa);
 
 int lightPin = A0;
 
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
-char ssid[] = "Linksys23718";        // your network SSID (name)
-char pass[] = "kmdjfy9qcn";     // your network password (use for WPA, or use as key for WEP)
+//char ssid[] = "Linksys23718";        // your network SSID (name)
+//char pass[] = "kmdjfy9qcn";     // your network password (use for WPA, or use as key for WEP)
+char ssid[] = "Treyney WiFi";
+char pass[] = "Bardo3434";  
 int keyIndex = 0;                 // your network key index number (needed only for WEP)
 
 
@@ -117,6 +123,7 @@ void setup() {
 
   Wire.begin();
   dht11.setDelay(10);
+  bme.begin();
 
   if (!SD.begin(chipSelect)) {
     digitalWrite(3, HIGH);
@@ -160,7 +167,6 @@ char message[100];
 int indexEnd;
 int out = 0;
 unsigned long previousMillis = 0;
-unsigned long previousJoystickMillis = 0;
 long interval = 100;
 
 void gatherData() {
@@ -170,13 +176,14 @@ void gatherData() {
     time_t time = now();
     unsigned long seconds = (unsigned long) time;
     int result = dht11.readTemperatureHumidity(temp, hum);
-    //barPres = pressureSensor.readFloatPressure();
-    //tvoc = AGS.readPPB();
+
     int light = analogRead(lightPin);
 
+    bme.read(bmePres, bmeTemp, bmeHum, tempUnit, presUnit);
+
     if (result == 0) {
-        sprintf(serialSend, "Otime=%lu;temp=%d;hum=%d;press=%d;light=%d:", seconds, temp, hum, 0,light);
-        Serial.println(serialSend);
+        sprintf(serialSend, "Otime=%lu;temp=%d;hum=%d;press=%.0f;light=%d:", seconds, temp, hum, bmePres, light);
+        //Serial.println(serialSend);
     } else {
         // Print error message based on the error code.
         Serial.println("ETemp/Humidity sensor connection failed");
@@ -228,10 +235,10 @@ void loop() {
   } else {
     //printWifiStatus();
 
-    Serial.println("\nStarting connection to server...");
+    //Serial.println("\nStarting connection to server...");
     // if you get a connection, report back via serial:
 
-    Serial.println(counter);
+    //Serial.println(counter);
     counter += 1;
 
     if (SD.exists("test.txt")) {
@@ -239,14 +246,15 @@ void loop() {
       client.connect(server, 301);
     }
     if (client.connected()) {
-      Serial.println("connected to server");
+      //Serial.println("connected to server");
       
       myFile = SD.open("test.txt");
       if (myFile) {
-        Serial.println("test.txt:");
+        //Serial.println("test.txt:");
 
         // read from the file until there's nothing else in it:
         while (myFile.available()) {
+          Serial.write(myFile.peek());
           client.write(myFile.read());
         }
         // close the file:
