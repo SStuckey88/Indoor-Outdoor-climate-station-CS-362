@@ -1,15 +1,15 @@
-/*
-
- This example is written for a network using WPA encryption. For
- WEP or WPA, change the WiFi.begin() call accordingly.
-
- Circuit:
- * Analog inputs attached to pins A0 through A5 (optional)
-
-
-  Find the full UNO R4 WiFi Network documentation here:
-  https://docs.arduino.cc/tutorials/uno-r4-wifi/wifi-examples#wi-fi-web-server
- */
+// Group: 44
+// Authors: Bryan Paulis bpaul21@uic.edu Sam Stuckey sstuc2@uic.edu Trey Wayne jwayn3@uic.edu
+// Indoor and Outdoor Climate Stations
+// 
+// Abstact:
+// This group project will present microcontroller based weather stations which are designed to measure and display environmental parameters such as temperature, humidity, and pressure.
+// The project is intended to provide accurate and continuous readings of local weather conditions depending on where the Arduinos are located (indoor and outdoor). 
+// This demonstrates systems and devices we have been learning throughout the semester such as input/output processing, serial communication, networking, and data visualization when dealing with results. 
+// This project will demonstrate our understanding of such topics we have been introduced to this semester.
+//
+// Info: Indoor weather station that gathers data and passes that to the pi along with data from the outdoor weather dtation
+//
 
 #include <WiFiS3.h>
 #include <DHT11.h>

@@ -1,12 +1,15 @@
-/*
-  TLS WiFi Web client
-
-  Board CA Root certificate bundle is embedded inside WiFi firmware:
-  https://github.com/arduino/uno-r4-wifi-usb-bridge/blob/main/certificates/cacrt_all.pem
-
-  Find the full UNO R4 WiFi Network documentation here:
-  https://docs.arduino.cc/tutorials/uno-r4-wifi/wifi-examples#wi-fi-web-client-ssl
-*/
+// Group: 44
+// Authors: Bryan Paulis bpaul21@uic.edu Sam Stuckey sstuc2@uic.edu Trey Wayne jwayn3@uic.edu
+// Indoor and Outdoor Climate Stations
+// 
+// Abstact:
+// This group project will present microcontroller based weather stations which are designed to measure and display environmental parameters such as temperature, humidity, and pressure.
+// The project is intended to provide accurate and continuous readings of local weather conditions depending on where the Arduinos are located (indoor and outdoor). 
+// This demonstrates systems and devices we have been learning throughout the semester such as input/output processing, serial communication, networking, and data visualization when dealing with results. 
+// This project will demonstrate our understanding of such topics we have been introduced to this semester.
+//
+// Info: Outdoor weather station that gathers data and writes to an sd card, constantly tries to connct to server and wifi, and finally sends data from sd once connected
+//
 
 #include <SD.h>
 #include <stdlib.h>
